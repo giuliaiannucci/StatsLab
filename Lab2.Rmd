@@ -224,6 +224,8 @@ ggplot(my_data, aes(x = sections, y = grades, group=instructor, fill=instructor)
 5. Import the WHR2018.csv data file, containing measure from the World Happiness report from 2018. For the years 2010 to 2015, what was the mean “healthy life expectancy at birth” for each year (find the mean for each year across countries). Show your results in a table and in a graph using ggplot.
 
 ```{r}
+library(dplyr)
+
 whr <- read.table("open_data/WHR2018.csv",
                   sep = ",",
                   header = TRUE)
@@ -267,6 +269,9 @@ ggplot(mean_hle, aes(x = year, y = mean_healty))+
                 width = .25)
 ```
 
+```{r}
+
+```
 
 
 
