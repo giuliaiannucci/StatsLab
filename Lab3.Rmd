@@ -9,3 +9,151 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+1. Create five samples of 25 observations from a normal distribution with mean 200, and standard deviation 100. Compute the mean of each sample, and plot the means in a graph using ggplot2. 
+
+```{r}
+observations <- rnorm(125,200,100)
+
+samples <- rep(1:5, each = 25)
+
+my_data <- data.frame(samples, observations)
+
+library(dplyr)
+
+means <- my_data %>%
+  group_by(samples) %>%
+  summarize(sample_mean = mean(observations),
+            sample_sd = sd(observations))
+
+library(ggplot2)
+
+ggplot(means, aes(x = samples, y = sample_mean))+
+  geom_bar(stat="identity")
+```
+2.
+
+
+```{r}
+observations <- rnorm(125,200,100)
+samples <- rep(1:5, each = 25)
+my_data <- data.frame(samples, observations)
+
+means <- my_data %>%
+  group_by(samples) %>%
+  summarize(sample_mean = mean(observations),
+            sample_sd = sd(observations))
+
+ggplot(means, aes(x = samples, y = sample_mean))+
+  geom_bar(stat="identity") +
+  geom_errorbar(aes(ymin = sample_mean - sample_sd,
+                    ymax = sample_mean + sample_sd),
+                width = .25)
+
+```
+
+3.
+
+```{r}
+observations <- rnorm(2*10000, 10, 5)
+samples <- rep(1:10000, each = 2)
+my_data <- data.frame(samples, observations)
+
+summarized_data <- my_data %>%
+  group_by(samples) %>%
+  summarise(samples_means = mean(observations))
+
+mean(summarized_data$samples_means)
+
+```
+
+```{r}
+observations <- rnorm(5*10000, 10, 5)
+samples <- rep(1:10000, each = 5)
+my_data <- data.frame(samples, observations)
+
+summarized_data <- my_data %>%
+  group_by(samples) %>%
+  summarise(samples_means = mean(observations))
+
+mean(summarized_data$samples_means)
+```
+
+
+```{r}
+
+observations <- rnorm(10*10000, 10, 5)
+samples <- rep(1:10000, each = 10)
+my_data <- data.frame(samples, observations)
+
+summarized_data <- my_data %>%
+  group_by(samples) %>%
+  summarise(samples_means = mean(observations))
+
+mean(summarized_data$samples_means)
+```
+
+```{r}
+
+sample_sizes <- c(2,5,10,50,100)
+sim_sample_means <- c()
+for(i in 1:length(sample_sizes)) { 
+  observations <- rnorm(sample_sizes[i]*10000, 10, 5)
+  samples <- rep(1:10000, each = sample_sizes[i])
+  my_data <- data.frame(samples, observations)
+
+summarized_data <- my_data %>%
+  group_by(samples) %>%
+  summarise(samples_means = mean(observations))
+
+sim_sample_means[i] <- mean(summarized_data$samples_means)
+}
+ 
+sim_sample_means
+
+sim_data <- data.frame(sample_sizes, sim_sample_means)
+
+ggplot(sim_data, aes(x=sample_sizes, y=sim_sample_means, group = 1))+
+  geom_point()+
+  geom_line()+
+  coord_cartesian(ylim = c(9,11))
+
+```
+
+4.
+
+```{r}
+sd_n <- function(x){
+  sqrt(sum((mean(x)-x)^2) / length(x))
+}
+
+sample_sizes <- c(2,5,10,50,100)
+sim_sample_sd <- c()
+sim_sample_sd_n <- c()
+for(i in 1:length(sample_sizes)) { 
+  observations <- rnorm(sample_sizes[i]*10000, 10, 5)
+  samples <- rep(1:10000, each = sample_sizes[i])
+  my_data <- data.frame(samples, observations)
+
+summarized_data <- my_data %>%
+  group_by(samples) %>%
+  summarise(samples_sd = sd(observations),
+            samples_sd_n = sd_n(observations))
+
+sim_sample_sd[i] <- mean(summarized_data$samples_sd)
+sim_sample_sd_n[i] <- mean(summarized_data$samples_sd_n)
+}
+ 
+sim_sample_means
+
+sim_data <- data.frame(n = rep(sample_sizes, 2), 
+                       est = c(sim_sample_sd_n, sim_sample_sd),
+                       formula = c(rep("n", 5), rep("n-1", 5)))
+
+ggplot(sim_data, aes(x=n, y=est, group=formula, color = formula))+
+  geom_point()+
+  geom_line()+
+  coord_cartesian(ylim = c(2.5,7.5))
+```
+
+
+
