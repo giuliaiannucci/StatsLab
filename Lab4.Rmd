@@ -10,3 +10,116 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Estimate the letter occurrence probabilities of all 26 letters in English by measuring a paragraph of English text from wikipedia. (hint use strsplit() to split a paragraph into individual letters) (1 point).
+
+
+```{r}
+my_paragraph <- "The notion of democracy has evolved over time considerably,[1] and, generally, the two current types of democracy are direct and representative. In a direct democracy, the people directly deliberate and decide on legislation. In a representative democracy, the people elect representatives to deliberate and decide on legislation, such as in parliamentary or presidential democracy.[2] Liquid democracy combines elements of these two basic types.
+
+Prevalent day-to-day decision making of democracies is the majority rule,[3][4] though other decision making approaches like supermajority and consensus have been equally integral to democracies. They serve the crucial purpose of inclusiveness and broader legitimacy on sensitive issues, counterbalancing majoritarianism, and therefore mostly take precedence on a constitutional level."
+
+the_letters <- unlist(strsplit(my_paragraph, split = ""))
+  
+the_letters
+
+lower_case <- tolower(the_letters)
+table(lower_case)
+
+letter_counts <- table(lower_case)
+letter_counts <- data.frame(letter_counts)
+
+library(dplyr)
+
+final <- letter_counts %>%
+  filter(lower_case %in% letters == TRUE)
+
+final
+
+total_letters <- sum(final$Freq)
+
+final <- final %>%
+  mutate(probabilities = Freq/total_letters)
+
+final
+knitr::kable(final)
+```
+
+2. Generate “random” strings of letters that are sampled from a distribution where letter occurrence probability is the same as natural English. Use the probabilities for each letter from this wikipedia article, or use your own estimates from the previous question (2 points).
+
+```{r}
+test_sample <- sample(x = final$lower_case, size = 5, replace = TRUE, 
+                      prob = final$probabilities)
+
+test_sample
+
+my_letters <- sample(final$lower_case,50*5,replace=TRUE,prob = final$probabilities )
+
+# turn the vector into a matrix with 5 columns
+my_strings <- matrix(my_letters, ncol=5)
+
+# each row is a word, need to collapse the column to create a string
+paste(my_strings[1,], collapse="")
+#> [1] "sbmwv"
+
+# loop to collapse all of the rows into words
+random_strings <-c()
+for(i in 1:dim(my_strings)[1]){
+  random_strings[i] <- paste(my_strings[i,], collapse="")
+}
+
+random_strings
+
+
+```
+
+
+3. Generate a random walk of 10,000 steps. In a random walk, you are simulating the process of randomly taking a step up or down, as if you are on an infinite staircase. At each step you flip a coin. If you get heads you go up one step, if you get tails you go down one step. Start on step 0, then simulate a random walk for 10,000 steps. Your vector should preserve the step number for each step. For example, if the the first three steps were all heads, then the vector would begin with 0,1,2,3, which indicates a single step up each time. Plot the first 1,000 steps. (1 point)
+
+```{r}
+
+step <- c(0)
+for (i in 1:10000){
+  coin_flip <- sample(c(1,-1),1)
+  step[i+1] <- step[i]+coin_flip
+}
+
+plot(step[1:10000])
+
+
+```
+```{r}
+
+plot(step)
+
+max(step)
+min(step)
+```
+
+5. 
+What was the longest run of steps where all steps were positive numbers. For example, in the sequence: 1,2,3,2,1,0,-1,-2,-1,-2,-1,0,1,2,3; the answer is 5 because the first five values were all positive, and this was the longest sequence of positive values. (1 point).
+
+```{r}
+
+logical_step <- sign(step)
+
+sequence <- c()
+counter <- 0
+
+for (i in 1:length(logical_step)) {
+  if(logical_step[i] == 0){
+    sequence <- c(sequence,counter)
+    counter <- 0
+  }else{
+    counter <- counter+logical_step[i]
+  }
+
+}
+
+sequence
+
+max(sequence)
+min(sequence)
+
+```
+
+
+
